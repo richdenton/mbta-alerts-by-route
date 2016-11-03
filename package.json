@@ -1,0 +1,16 @@
+{
+	"name": "mbta-alerts-by-route",
+	"version": "0.0.1",
+	"description": "MBTA Alerts by Route",
+	"main": "server.js",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/richdenton/mbta-alerts-by-route.git"
+	},
+	"author": "Rich Denton",
+	"readmeFilename": "README.md",
+	"dependencies": {
+		"request": "~2.21.0",
+		"simple-twitter": "~1.0.3"
+	}
+}

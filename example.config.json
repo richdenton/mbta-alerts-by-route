@@ -1,0 +1,13 @@
+{
+	"interval": 60000,
+	"mbta": {
+		"key": "Obtain from http://realtime.mbta.com/portal",
+		"route": "CR-Needham"
+	},
+	"twitter": {
+		"consumerKey": "Obtain from https://dev.twitter.com",
+		"consumerSecret": "Obtain from https://dev.twitter.com",
+		"token": "Obtain from https://dev.twitter.com",
+		"tokenSecret": "Obtain from https://dev.twitter.com"
+	}
+}
