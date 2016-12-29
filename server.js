@@ -1,6 +1,6 @@
 var config = require('./config'),
 	Twitter = require('simple-twitter'),
-	bot = new Twitter(config.consumerKey, config.consumerSecret, config.token, config.tokenSecret),
+	bot = new Twitter(config.twitter.consumerKey, config.twitter.consumerSecret, config.twitter.token, config.twitter.tokenSecret),
 	request = require('request'),
 	parameters = {
 		url: 'http://realtime.mbta.com/developer/api/v2/alertsbyroute',
