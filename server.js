@@ -3,14 +3,14 @@ var config = require('./config'),
 	bot = new Twitter(config.twitter.consumerKey, config.twitter.consumerSecret, config.twitter.token, config.twitter.tokenSecret),
 	request = require('request'),
 	parameters = {
-		url: 'http://realtime.mbta.com/developer/api/v2/alertsbyroute',
+		url: 'https://api-v3.mbta.com/alerts',
 		qs: {
 			api_key: config.mbta.key,
 			route: config.mbta.route
 		},
 		json: true
 	},
-	last_checked = Math.floor(new Date().getTime() / 1000);
+	last_checked = Math.floor(new Date().getTime() / 1000) - (config.continuous ? 0 : config.interval / 1000);
 
 /*
  * Ensure content will fit in a tweet
@@ -43,36 +43,46 @@ function sanitize(message) {
 function tweet(message) {
 	bot.post('statuses/update', {
 		status: message
-	}, function (error) {
-		if (error) {
+	}, function(error) {
+		if (error && config.debug) {
 			console.log(error);
 		}
 	});
-	console.log('Tweeting: ' + message);
 }
 
 /*
- * The main, recursive loop
+ * Make the request
+ * Note: This function is run recursively if "continuous" is set in the config
  */
 function main() {
 	request(parameters, function(error, response, body) {
-		if (error) {
+		if (error && config.debug) {
 			console.log(error);
-		} else if (body && body.alerts) {
+		} else if (body && body.data) {
 			
 			// Parse all available alerts
-			body.alerts.forEach(function(alert) {
+			var timestamp;
+			body.data.forEach(function(alert) {
 				
 				// Check alert timestamp against last checked timestamp
-				if (alert.created_dt && alert.created_dt > last_checked) {
-					tweet(sanitize(alert.short_header_text || alert.header_text));
-					last_checked = alert.created_dt;
+				if (alert.attributes && alert.attributes.created_at) {
+					timestamp = Date.parse(alert.attributes.created_at) / 1000;
+					if (timestamp > last_checked) {
+						if (config.continuous) {
+							last_checked = timestamp;
+						}
+						
+						// Tweet the alert
+						tweet(sanitize(alert.attributes.short_header || alert.attributes.header));
+					}
 				}
 			});
 		}
 		
 		// Restart the process
-		setTimeout(main, config.interval);
+		if (config.continuous) {
+			setTimeout(main, config.interval);
+		}
 	});
 }
 
